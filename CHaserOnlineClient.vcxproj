@@ -136,6 +136,7 @@
     <ClCompile Include="src\CHaser_Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\CHaser_Defines.h" />
     <ClInclude Include="include\CHaser_Main.h" />
     <ClInclude Include="include\CHaser_Client.h" />
     <ClInclude Include="include\CHaser_Socket.h" />

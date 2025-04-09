@@ -2,10 +2,16 @@
 
 int main() {
 
+	std::string returnCode;
+
 	while (1) {
 
-		client.GetReadyCheck("gr");
-		client.CommandCheck("wu");
+		returnCode = client.GetReadyCheck("gr");
+		std::cout << returnCode << std::endl;
+
+		returnCode = client.CommandCheck("wu");
+		std::cout << returnCode << std::endl;
+
 		client.EndCommandCheck();
 	}
 
