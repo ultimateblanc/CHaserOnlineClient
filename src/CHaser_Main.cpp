@@ -33,27 +33,27 @@ int main(int argc, char** argv) {
 #ifndef TARGET_HOST
 #error サーバーのホストが定義されていません
 #endif
-	if (targetHost.empty()) targetHost = "www7019ug.sakura.ne.jp";
+	if (targetHost.empty()) targetHost = TARGET_HOST;
 
 #ifndef TARGET_PORT
 #error サーバーのポートが定義されていません
 #endif
-	if (targetPort.empty()) targetPort = "80";
+	if (targetPort.empty()) targetPort = TARGET_PORT;
 
 #ifndef USERNAME
 #error ユーザー名が定義されていません
 #endif
-	if (username.empty()) username = "cool";
+	if (username.empty()) username = USERNAME;
 
 #ifndef PASSWORD
 #error パスワードが定義されていません
 #endif
-	if (password.empty()) password = "cool";
+	if (password.empty()) password = PASSWORD;
 	
 #ifndef ROOM_NUMBER
 #error ルーム番号が定義されていません
 #endif
-	if (roomNumber.empty()) roomNumber = "6743";
+	if (roomNumber.empty()) roomNumber = ROOM_NUMBER;
 
 	std::cout << "プロキシ: " << proxyHost << ":" << proxyPort << std::endl;
 	std::cout << "サーバー: " << targetHost << ":" << targetPort << std::endl;
