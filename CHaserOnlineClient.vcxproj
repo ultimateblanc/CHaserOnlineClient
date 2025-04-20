@@ -129,8 +129,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\CHaser_Main.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\CHaser_Main.cpp" />
     <ClCompile Include="src\CHaser_Client.cpp" />
     <ClCompile Include="src\CHaser_Socket.cpp" />
     <ClCompile Include="src\CHaser_Utils.cpp" />

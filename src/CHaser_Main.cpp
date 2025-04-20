@@ -6,16 +6,14 @@ int main(int argc, char** argv) {
 
 	int returnVal = 0;
 	std::string proxyHost, proxyPort, targetHost, targetPort, username, password, roomNumber;
-	std::string url;
 	std::unordered_map<std::string, std::string> options;
 
 	if (1 < argc) {
-		url = argv[1];
 		options = CHaser::Utils::GetOptions(argc, argv);
 	}
 
 	std::tie(proxyHost, proxyPort) = CHaser::Utils::SplitHostPort(options["-x"]);
-	std::tie(targetHost, targetPort) = CHaser::Utils::SplitHostPort(CHaser::Utils::ExtractHost(url));
+	std::tie(targetHost, targetPort) = CHaser::Utils::SplitHostPort(CHaser::Utils::ExtractHost(options["url"]));
 	username = options["-u"];
 	password = options["-p"];
 	roomNumber = options["-r"];
@@ -55,29 +53,29 @@ int main(int argc, char** argv) {
 #endif
 	if (roomNumber.empty()) roomNumber = ROOM_NUMBER;
 
-	std::cout << "プロキシ: " << proxyHost << ":" << proxyPort << std::endl;
-	std::cout << "サーバー: " << targetHost << ":" << targetPort << std::endl;
-	std::cout << "ユーザー名: " << username << std::endl;
-	std::cout << "パスワード: " << password << std::endl;
-	std::cout << "ルーム番号: " << roomNumber << std::endl;
+	CHaser::Utils::Log("プロキシ: " + proxyHost + ":" + proxyPort, CHaser::Utils::CLIENT);
+	CHaser::Utils::Log("サーバー: " + targetHost + ":" + targetPort, CHaser::Utils::CLIENT);
+	CHaser::Utils::Log("ユーザー名: " + username, CHaser::Utils::CLIENT);
+	CHaser::Utils::Log("パスワード: " + password, CHaser::Utils::CLIENT);
+	CHaser::Utils::Log("ルーム番号: " + roomNumber, CHaser::Utils::CLIENT);
 
 	try {
 
-		std::cout << "初期化を開始..." << std::endl;
 		client.Init(proxyHost, proxyPort, targetHost, targetPort);
-
-		std::cout << "ユーザー認証を開始..." << std::endl;
+		CHaser::Utils::Log("初期化に成功しました", CHaser::Utils::OK);
+		
 		client.UserCheck(username, password);
+		CHaser::Utils::Log("ユーザー認証に成功しました", CHaser::Utils::OK);
 
-		std::cout << "ルーム接続を開始..." << std::endl;
 		client.RoomNumberCheck(roomNumber);
+		CHaser::Utils::Log("ルーム接続に成功しました", CHaser::Utils::OK);
 
-		std::cout << "メインプログラムを開始..." << std::endl;
+		CHaser::Utils::Log("メインプログラムを開始しました", CHaser::Utils::CLIENT);
 		returnVal = CHaser_Main();
 	}
 	catch (const std::exception& ex) {
 
-		std::cerr << ex.what() << std::endl;
+		CHaser::Utils::Log(ex.what(), CHaser::Utils::ERR);
 
 		return 1;
 	}

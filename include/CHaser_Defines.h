@@ -5,8 +5,9 @@
 #define PROXY_PORT "80"
 #define TARGET_HOST "www7019ug.sakura.ne.jp"
 #define TARGET_PORT "80"
-#define USERNAME "cool"
+#define USERNAME "cool09"
 #define PASSWORD "cool"
-#define ROOM_NUMBER "6743"
+#define ROOM_NUMBER "6742"
+#define ATTEMPT_LIMIT 10 //’ÊMƒGƒ‰[”­¶‚ÉÄÚ‘±‚ğ‚İ‚é‰ñ”‚ÌãŒÀ
 
 #endif

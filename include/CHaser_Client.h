@@ -3,9 +3,11 @@
 
 #include "../include/CHaser_Socket.h"
 #include "../include/CHaser_Utils.h"
+#include "../include/CHaser_Defines.h"
 
 #include <iostream>
 #include <string>
+#include <conio.h>
 
 namespace CHaser {
 
@@ -19,6 +21,7 @@ namespace CHaser {
 		std::string GetReadyCheck(const std::string getReady);
 		std::string CommandCheck(const std::string command);
 		void EndCommandCheck();
+		std::string FullCommandCheck(const std::string command);
 
 	private:
 		std::string proxyHost, proxyPort, targetHost, targetPort, sessionID;

@@ -9,7 +9,7 @@ void CHaser::Client::Init(const std::string _proxyHost, const std::string _proxy
 
 	if (!Socket::Init(_proxyHost, _proxyPort)) {
 
-		throw std::runtime_error("初期化に失敗");
+		throw std::runtime_error("クライアント初期化に失敗");
 	}
 }
 
@@ -22,7 +22,7 @@ std::string CHaser::Client::Command(const std::string command, const std::string
 		
 		if (!Socket::Next()) {
 
-			throw std::runtime_error("接続に失敗");
+			throw std::runtime_error("サーバー接続に失敗");
 		}
 	}
 
@@ -44,7 +44,7 @@ std::string CHaser::Client::Command(const std::string command, const std::string
 
 		if (10 < count) {
 
-			throw std::runtime_error("送信に失敗");
+			throw std::runtime_error("データ送信に失敗");
 		}
 	}
 
@@ -68,9 +68,9 @@ std::string CHaser::Client::Command(const std::string command, const std::string
 
 		recvBuf.clear();
 
-		if (10 < count) {
+		if (ATTEMPT_LIMIT < count) {
 
-			throw std::runtime_error("受信に失敗");
+			throw std::runtime_error("データ受信に失敗");
 		}	
 	}
 
@@ -79,83 +79,121 @@ std::string CHaser::Client::Command(const std::string command, const std::string
 
 void CHaser::Client::UserCheck(const std::string username, const std::string password) {
 
-	int count = 0;
+	int count = 0, status;
 	std::string recvBuf;
 
 	while (1) {
 
-		count++;
+		if (_kbhit() && _getch() == (int)'q') {
 
-		if (10 < count) {
-
-			throw std::runtime_error("ユーザー認証に失敗");
+			throw std::runtime_error("強制終了しました");
 		}
 
 		recvBuf = Command("UserCheck", "user=" + username + "&pass=" + password);
+		
+		status = Utils::ExtractStatusCode(recvBuf);
 
-		if (recvBuf.find("200 OK") == std::string::npos || recvBuf.find("roomNumber=") == std::string::npos) {
+		if (200 <= status && status < 300) {
 
-			continue;
+			if (recvBuf.find("roomNumber=") != std::string::npos) {
+
+				sessionID = Utils::ExtractSessionID(recvBuf);
+
+				if (!sessionID.empty()) {
+
+					break;
+				}
+			}
+		}
+		else {
+
+			Utils::Log("無効なレスポンスを受信しました ステータスコード: " + std::to_string(status), Utils::ERR);
+
+			count++;
 		}
 
-		sessionID = Utils::ExtractSessionID(recvBuf);
+		if (ATTEMPT_LIMIT <= count) {
 
-		if (!sessionID.empty()) {
-
-			break;
+			throw std::runtime_error("ユーザー認証に失敗しました");
 		}
 	}
 }
 
 void CHaser::Client::RoomNumberCheck(const std::string roomNumber) {
 
-	int count = 0;
+	int count = 0, status;
 	std::string recvBuf;
 
 	while (1) {
 
-		count++;
+		if (_kbhit() && _getch() == (int)'q') {
 
-		if (10 < count) {
-
-			throw std::runtime_error("ルーム接続に失敗");
+			throw std::runtime_error("強制終了しました");
 		}
 
 		recvBuf = Command("RoomNumberCheck", "roomNumber=" + roomNumber);
 
-		if (recvBuf.find("200 OK") != std::string::npos && recvBuf.find("command1=") != std::string::npos) {
+		status = Utils::ExtractStatusCode(recvBuf);
 
-			break;
+		if (200 <= status && status < 300) {
+
+			if (recvBuf.find("command1=") != std::string::npos) {
+
+				break;
+			}
+		}
+		else {
+
+			Utils::Log("無効なレスポンスを受信しました ステータスコード: " + std::to_string(status), Utils::ERR);
+
+			count++;
+		}
+
+		if (ATTEMPT_LIMIT <= count) {
+
+			throw std::runtime_error("ルーム接続に失敗しました");
 		}
 	}
 }
 
 std::string CHaser::Client::GetReadyCheck(const std::string getReady) {
 
-	int count = 0;
+	int count = 0, status;
 	std::string recvBuf, returnCode;
 
 	while (1) {
 
-		count++;
+		if (_kbhit() && _getch() == (int)'q') {
 
-		if (10 < count) {
-
-			throw std::runtime_error("準備コマンドの送信に失敗");
+			throw std::runtime_error("強制終了しました");
 		}
 
 		recvBuf = Command("GetReadyCheck", "command1=" + getReady);
 
-		if (recvBuf.find("200 OK") == std::string::npos || recvBuf.find("GetReady ReturnCode=") == std::string::npos) {
+		status = Utils::ExtractStatusCode(recvBuf);
 
-			continue;
+		if (200 <= status && status < 300) {
+
+			if (recvBuf.find("GetReady ReturnCode=") != std::string::npos) {
+
+				returnCode = Utils::ExtractReturnCode(recvBuf);
+
+				if (!returnCode.empty()) {
+
+					break;
+				}
+			}
+		}
+		else {
+
+			Utils::Log("無効なレスポンスを受信しました ステータスコード: " + std::to_string(status), Utils::ERR);
+
+			count++;
 		}
 
-		returnCode = Utils::ExtractReturnCode(recvBuf);
+		if (ATTEMPT_LIMIT <= count) {
 
-		if (!returnCode.empty()) {
-
-			break;
+			throw std::runtime_error("準備コマンドの送信に失敗しました");
 		}
 	}
 
@@ -164,30 +202,42 @@ std::string CHaser::Client::GetReadyCheck(const std::string getReady) {
 
 std::string CHaser::Client::CommandCheck(const std::string command) {
 
-	int count = 0;
+	int count = 0, status;
 	std::string recvBuf, returnCode;
 
 	while (1) {
 
-		count++;
+		if (_kbhit() && _getch() == (int)'q') {
 
-		if (10 < count) {
-
-			throw std::runtime_error("行動コマンドの送信に失敗");
+			throw std::runtime_error("強制終了しました");
 		}
 
 		recvBuf = Command("CommandCheck", "command2=" + command);
 
-		if (recvBuf.find("200 OK") == std::string::npos || recvBuf.find("Action ReturnCode=") == std::string::npos) {
+		status = Utils::ExtractStatusCode(recvBuf);
 
-			continue;
+		if (200 <= status && status < 300) {
+
+			if (recvBuf.find("Action ReturnCode=") != std::string::npos) {
+
+				returnCode = Utils::ExtractReturnCode(recvBuf);
+
+				if (!returnCode.empty()) {
+
+					break;
+				}
+			}
+		}
+		else {
+
+			Utils::Log("無効なレスポンスを受信しました ステータスコード: " + std::to_string(status), Utils::ERR);
+
+			count++;
 		}
 
-		returnCode = Utils::ExtractReturnCode(recvBuf);
+		if (ATTEMPT_LIMIT <= count) {
 
-		if (!returnCode.empty()) {
-
-			break;
+			throw std::runtime_error("行動コマンドの送信に失敗しました");
 		}
 	}
 
@@ -196,25 +246,47 @@ std::string CHaser::Client::CommandCheck(const std::string command) {
 
 void CHaser::Client::EndCommandCheck() {
 
-	int count = 0;
+	int count = 0, status;
 	std::string recvBuf;
 
 	while (1) {
 
-		count++;
+		if (_kbhit() && _getch() == (int)'q') {
 
-		if (10 < count) {
-
-			throw std::runtime_error("終了コマンドの送信に失敗");
+			throw std::runtime_error("強制終了しました");
 		}
 
 		recvBuf = Command("EndCommandCheck", "command3=%23");
 
-		if (recvBuf.find("200 OK") != std::string::npos && recvBuf.find("command1=") != std::string::npos) {
+		status = Utils::ExtractStatusCode(recvBuf);
 
-			break;
+		if (200 <= status && status < 300) {
+
+			if (recvBuf.find("command1=") != std::string::npos) {
+
+				break;
+			}
+		}
+		else {
+
+			Utils::Log("無効なレスポンスを受信しました ステータスコード: " + std::to_string(status), Utils::ERR);
+
+			count++;
+		}
+		
+		if (ATTEMPT_LIMIT <= count) {
+
+			throw std::runtime_error("終了コマンドの送信に失敗しました");
 		}
 	}
+}
+
+std::string CHaser::Client::FullCommandCheck(const std::string command) {
+
+	std::string returnCode = CommandCheck(command);
+	EndCommandCheck();
+
+	return returnCode;
 }
 
 CHaser::Client client;
