@@ -1,15 +1,17 @@
-CHaser_Client ソケットを用いたクライアントのコマンド送信クラス
+# CHaserOnlineClient 2025
 
-CHaser_Main クライアントの初期化の処理
+## 使い方
+1. includeとsrcフォルダ、main.cppを自分のプロジェクトに配置する
+2. main.cppに記述されたコードに従ってプログラムを記述
+3. /include/CHaser_Defines.hのプリプロセッサを調整
+4. デバック
 
-CHaser_Socket WinSockをカプセル化したクラス
-
-CHaser_Utils 入力内容の検証やコマンドライン引数の解析をする関数
-
-CHaser_Defines 入力内容を設定したり、フラグを立てたりできるファイル
-
-実行方法
-
+## コマンドライン引数
 CHaserOnlineClient.exe [url] -u [ユーザー] -p [パスワード] -x [プロキシ]
 
-コマンドライン引数で指定されなかった場合CHaser_Defines.hで設定した入力が使われます
+## 注意点
+- main.cppのmain関数はコマンドライン引数を受け取れません
+- clientという変数名を使うことはできません
+- コマンドライン引数で指定されなかったパラメーターは/include/CHaser_Defines.hのプリプロセッサが適用されます
+- プロキシはip(host):portの形にしてください
+- プロキシが不要な場合、urlのホストとポートを指定してください
